@@ -64,5 +64,23 @@ object SparkCoalesceExample {
      * +----------+-----+-------------------+
      */
     dfWithGrowthRate.show()
+
+    spark
+      .createDataFrame(
+        Seq(
+          ("2023-07-20", 100),
+          ("2023-07-21", 120),
+          ("2023-07-23", 160),
+          ("2023-07-22", 140),
+          ("2023-07-24", 180)
+        ))
+      .toDF("date", "value")
+      .withColumn("date", to_date(col("date")))
+      .withColumn(
+        "growth_rate",
+        (col("value") - lag("value", 1).over(windowSpec)) / lag("value", 1).over(windowSpec)
+      )
+      .show()
+
   }
 }
